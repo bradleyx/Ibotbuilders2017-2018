@@ -23,6 +23,10 @@ public class teleoppract extends LinearOpMode {
     public void runOpMode() {
         double left;
         double right;
+        double fright;
+        double diagonal1;
+        double diagonal2;
+
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -40,46 +44,72 @@ public class teleoppract extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
+            // Run wheels in tank mode
 
-            right = gamepad1.right_stick_y;
-            left = gamepad1.left_stick_y;
-            robot.leftm.setPower(left);
-            robot.rightm.setPower(right);
+
+
+
+            robot.rightm.setPower(.52*gamepad1.right_stick_y);
+            robot.leftm.setPower(.52*gamepad1.left_stick_y);
+            robot.fleftm.setPower(.52*gamepad1.left_stick_y);
+            robot.frightm.setPower(.52*gamepad1.right_stick_y);
+
+            if(gamepad2.dpad_up)
+            {
+                robot.lifting.setPower(.3);
+            }
+            while(gamepad1.dpad_left==true)
+            {
+                robot.rightm.setPower(1);
+                robot.leftm.setPower(-1);
+                robot.fleftm.setPower(1);
+                robot.frightm.setPower(-1);
+            }
+            while(gamepad1.dpad_right==true)
+            {
+                robot.rightm.setPower(-1);
+                robot.leftm.setPower(1);
+                robot.fleftm.setPower(-1);
+                robot.frightm.setPower(1);
+            }
+            if(gamepad2.dpad_left)
+            {
+                robot.lifting.setPower(0);
+            }
+            if(gamepad2.dpad_right)
+            {
+                robot.lifting.setPower(.1);
+            }
+            if(gamepad2.dpad_down)
+            {
+                robot.lifting.setPower(-.02);
+            }
+
+
+
+
+            //normal driving
+
+            //hroizontal driving
+
 
 
 
 
             if(gamepad2.a){
 
-                robot.arml.setPosition(.35);
-                robot.armr.setPosition(.7);
+                robot.arml.setPosition(1);
+                robot.armr.setPosition(.3);
             }
             if(gamepad2.x){
-                robot.arml.setPosition(.75);
-                robot.armr.setPosition(.4);
+                robot.arml.setPosition(.7);
+                robot.armr.setPosition(.856);
             }
             if(gamepad2.b){
-                robot.arml.setPosition(.55);
-                robot.armr.setPosition(.5);
+                robot.arml.setPosition(.5);
+                robot.armr.setPosition(1);
             }
-            if(gamepad2.dpad_down)
-            {
-
-            }
-            if (gamepad1.y) {
-                robot.lifting.setPower(.45);
-            }
-            if(gamepad1.a){
-                robot.lifting.setPower(-.017);
-            }
-            if(gamepad1.x){
-                robot.lifting.setPower(.1);
-            }
-            if(gamepad1.b){
-                robot.lifting.setPower(0);
-            }
-
+          
 
 
 

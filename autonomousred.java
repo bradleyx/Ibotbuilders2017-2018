@@ -37,6 +37,8 @@ public class autonomousred extends LinearOpMode{
     public Servo arml=null;
     public Servo armr= null;
     DcMotor drivemotorL = null;
+    DcMotor FdrivemotorL=null;
+    DcMotor FdrivemotorR = null;
     DcMotor drivemotorR = null;
 
     ColorSensor color;
@@ -152,25 +154,31 @@ public class autonomousred extends LinearOpMode{
         }
     }
 
-    public void encoderDrivebyDistance(double speed,
+   /* public void encoderDrivebyDistance(double speed,
                                        double leftInches, double rightInches) {
         int newLeftTarget;
         int newRightTarget;
+        int fnewLeftTarget;
+        int fnewRightTarget;
 
-        int mvLeftDir, mvRightDir;
+        int mvLeftDir, mvRightDir,FmvLeftDir, FmvRightDir;
 
         if( speed * leftInches > 0){
             mvLeftDir = 1;
+            FmvLeftDir=1;
         }
         else{
             mvLeftDir = 0;
+            FmvLeftDir=0;
         }
 
         if( speed * rightInches > 0){
             mvRightDir = 1;
+            FmvRightDir = 0;
         }
         else{
             mvRightDir = 0;
+            FmvRightDir = 0;
         }
 
         // Ensure that the opmode is still active
@@ -180,26 +188,34 @@ public class autonomousred extends LinearOpMode{
             if (speed < 0) {
                 newLeftTarget = drivemotorL.getCurrentPosition() - (int) (leftInches * COUNTS_PER_INCH);
                 newRightTarget = drivemotorR.getCurrentPosition() - (int) (rightInches * COUNTS_PER_INCH);
+                fnewLeftTarget = FdrivemotorL.getCurrentPosition() - (int) (leftInches * COUNTS_PER_INCH);
+                fnewRightTarget = FdrivemotorR.getCurrentPosition() - (int) (rightInches * COUNTS_PER_INCH);
             } else {
                 newLeftTarget = drivemotorL.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
                 newRightTarget = drivemotorR.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
+                fnewLeftTarget = FdrivemotorL.getCurrentPosition() +(int) (leftInches * COUNTS_PER_INCH);
+                fnewRightTarget = FdrivemotorR.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
             }
             drivemotorL.setTargetPosition(newLeftTarget);
             drivemotorR.setTargetPosition(newRightTarget);
-
+            FdrivemotorL.setTargetPosition(fnewLeftTarget);
+            FdrivemotorR.setTargetPosition(fnewRightTarget);
             // Turn On RUN_TO_POSITION
             drivemotorL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             drivemotorR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            FdrivemotorL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            FdrivemotorR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // reset the timeout time and start motion.
             runtime.reset();
             drivemotorL.setPower(speed);
             drivemotorR.setPower(speed);
-
+            FdrivemotorL.setPower(speed);
+            FdrivemotorR.setPower(speed);
 
             while (opModeIsActive() &&
                     //        (drivemotorL.getCurrentPosition() > newLeftTarget) &&
-                    (drivemotorL.isBusy() && drivemotorR.isBusy())) {
+                    (drivemotorL.isBusy() && drivemotorR.isBusy() && FdrivemotorL.isBusy() && FdrivemotorR.isBusy())) {
 
                 // Display it for the driver.
                 telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
@@ -229,15 +245,40 @@ public class autonomousred extends LinearOpMode{
                         drivemotorR.setPower(0);
                     }
                 }
+                if( FmvLeftDir == 1 ){
+                    if( FdrivemotorL.getCurrentPosition() >= fnewLeftTarget ){
+                        FdrivemotorL.setPower(0);
+                    }
+                }
+                else{
+                    if( FdrivemotorL.getCurrentPosition() <= fnewLeftTarget ) {
+                        FdrivemotorL.setPower(0);
+                    }
+                }
+                //right to the position
+                if( FmvRightDir == 1 ){
+                    if( FdrivemotorR.getCurrentPosition() >= fnewRightTarget ){
+                        FdrivemotorR.setPower(0);
+                    }
+                }
+                else {
+                    if (FdrivemotorR.getCurrentPosition() <= newRightTarget) {
+                        FdrivemotorR.setPower(0);
+                    }
+                }
             }
 
             // Stop all motion;
             drivemotorL.setPower(0);
             drivemotorR.setPower(0);
+            FdrivemotorL.setPower(0);
+            FdrivemotorR.setPower(0);
 
             // Turn off RUN_TO_POSITION
             drivemotorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             drivemotorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            FdrivemotorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            FdrivemotorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             //  sleep(250);   // optional pause after each move
         }
@@ -262,6 +303,21 @@ public class autonomousred extends LinearOpMode{
         {
 
         }
+
+    }*/
+     public void mecright()
+    {
+        drivemotorL.setPower(-1);
+        FdrivemotorL.setPower(1);
+        FdrivemotorR.setPower(-1);
+        drivemotorR.setPower(1);
+    }
+    public void mecleft()
+    {
+        drivemotorL.setPower(1);
+        FdrivemotorL.setPower(-1);
+        FdrivemotorR.setPower(1);
+        drivemotorR.setPower(-1);
 
     }
     public void StopDriving()
@@ -301,17 +357,23 @@ public class autonomousred extends LinearOpMode{
         float hsvValues[] = {0,0,0};
         final float values[] = hsvValues;
         final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(R.id.RelativeLayout);
-        drivemotorL = hardwareMap.dcMotor.get("leftmotor_drive");
+       drivemotorL = hardwareMap.dcMotor.get("leftmotor_drive");
         drivemotorR = hardwareMap.dcMotor.get("rightmotor_drive");
-        color=hardwareMap.colorSensor.get("color");
-        lever=hardwareMap.servo.get("lever");
-        arml=hardwareMap.servo.get("arml");
-        armr=hardwareMap.servo.get("armr");
+        FdrivemotorL = hardwareMap.dcMotor.get("frontleft_drive");
+        FdrivemotorR = hardwareMap.dcMotor.get("frontright_drive");
+       color=hardwareMap.colorSensor.get("color");
+       lever=hardwareMap.servo.get("lever");
+      //  arml=hardwareMap.servo.get("arml");
+      //  armr=hardwareMap.servo.get("armr");
+        FdrivemotorL.setDirection(DcMotor.Direction.FORWARD);
+        FdrivemotorR.setDirection(DcMotor.Direction.REVERSE);
+        FdrivemotorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FdrivemotorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         drivemotorL.setDirection(DcMotor.Direction.FORWARD);
         drivemotorR.setDirection(DcMotor.Direction.REVERSE);
         drivemotorL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         drivemotorR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-         color.enableLed(true);
+        color.enableLed(true);
 
         //Start dat robot
 
@@ -326,36 +388,41 @@ public class autonomousred extends LinearOpMode{
         // Thread.sleep(400);
         // Go forward
         //driveForwardTime(.5, 850);
-        armr.setPosition(.7);
-        arml.setPosition(.35);
-        lever.setPosition(.3);
-        encoderDrivebyDistance(-.2,1,2);
-        Thread.sleep(200);
-        encoderDrivebyDistance(-.1,.75,1.5);
+     //   armr.setPosition(.7);
+     //   arml.setPosition(.35);
+
+       lever.setPosition(.15 );
+       // encoderDrivebyDistance(-.2,1,2);
+      // Thread.sleep(200);
+      //  encoderDrivebyDistance(-.1,.75,1.5);
+        Thread.sleep(2000);
       Color.RGBToHSV(color.red() * 8, color.green() * 8, color.blue() * 8, hsvValues);
 
         // send the info back to driver station using telemetry function.
-        telemetry.addData("Red ", color.red()*8);
-        telemetry.addData("Green ", color.green()*8);
-        telemetry.addData("Blue ", color.blue()*8);
+        telemetry.addData("Red ", color.red());
+        telemetry.addData("Green ", color.green());
+        telemetry.addData("Blue ", color.blue());
 
-   /*    relativeLayout.post(new Runnable() {
+      relativeLayout.post(new Runnable() {
             public void run() {
                 relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
             }
-        });*/
+        });
         telemetry.update();
-        Thread.sleep(2002);
+        Thread.sleep(2000);
 
         if(color.red() >= 1)
         {
             telemetry.addData("RED", color.red());
             telemetry.update();
-            Thread.sleep(40);
-            encoderTurnByDistance(.3, 90, LEFT);
-            Thread.sleep(500);
-            encoderDrivebyDistance(1, 5, 5);
-            lever.setPosition(Servo.MIN_POSITION);
+            Thread.sleep(100);
+            mecleft();
+            Thread.sleep(3000);
+          //  Thread.sleep(40);
+        //    encoderTurnByDistance(.3, 90, LEFT);
+         //   Thread.sleep(500);
+         //   encoderDrivebyDistance(1, 5, 5);
+           // lever.setPosition(Servo.MIN_POSITION);
             //encoderDrivebyDistance(-).5, 5, 5);
             //Thread.sleep(200);
             //encoderDrivebyDistance(.2, 24,24);
@@ -378,17 +445,17 @@ public class autonomousred extends LinearOpMode{
             telemetry.addData("BLUE", color.blue());
             telemetry.update();
             Thread.sleep(100);
-
+            mecright();
             //Thread.sleep(200);
             //encoderTurnByDistance(.2, 90, LEFT);
             //Thread.sleep(400);
             //encoderDrivebyDistance(.2, 33, 33);
             //Thread.sleep(400);
-            encoderTurnByDistance(-.2, 45, RIGHT);
+            //encoderTurnByDistance(-.2, 45, RIGHT);
             //Thread.sleep(200);
-            Thread.sleep(500);
-            encoderDrivebyDistance(1, 5, 5);
-            lever.setPosition(Servo.MIN_POSITION);
+            Thread.sleep(3000);
+           // encoderDrivebyDistance(1, 5, 5);
+        //    lever.setPosition(Servo.MIN_POSITION);
             //encoderDrivebyDistance(.2, 24, 24);
             //encoderTurnByDistance(.2, 47, RIGHT);
             //Thread.sleep(200);
